@@ -34,7 +34,7 @@ class DataProcessor:
             if isinstance(parsed, dict):
                 return parsed
             return None
-        except json.JSONDecodeError, TypeError:
+        except (json.JSONDecodeError, TypeError):
             return None
 
     @staticmethod

@@ -34,14 +34,14 @@ testpaths = [
 
 [tool.black]
 line-length = 88
-target-version = ['py314']
+target-version = ['py312']
 
 [tool.ruff]
 line-length = 88
-target-version = "py314"
+target-version = "py312"
 
 [tool.mypy]
-python_version = "3.14"
+python_version = "3.12"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
