@@ -23,13 +23,15 @@ jobs:
           enable-cache: true
 
       - name: Install Dependencies
-        run: uv pip install --system --break-system-packages -r requirements-dev.txt -e .
+        run: |
+          uv sync --extra dev
+          echo "$GITHUB_WORKSPACE/.venv/bin" >> $GITHUB_PATH
 
       - name: Check Code Formatting (Black)
-        run: black --check src/ tests/
+        run: uv run black --check src/ tests/
 
       - name: Lint Code (Ruff)
-        run: ruff check src/ tests/
+        run: uv run ruff check src/ tests/
 
       - name: Type Checking (mypy)
-        run: mypy src/
+        run: uv run mypy src/

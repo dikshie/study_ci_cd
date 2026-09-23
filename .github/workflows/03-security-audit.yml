@@ -27,16 +27,17 @@ jobs:
 
       - name: Install Audit Tools
         run: |
-          uv pip install --system --break-system-packages bandit pip-audit
+          uv sync --extra dev
+          echo "$GITHUB_WORKSPACE/.venv/bin" >> $GITHUB_PATH
 
       - name: Run Bandit (SAST Code Vulnerability Scan)
         run: |
-          bandit -r src/ -f json -o bandit-results.json || true
-          bandit -r src/ -ll
+          uv run bandit -r src/ -f json -o bandit-results.json || true
+          uv run bandit -r src/ -ll
 
       - name: Run Pip-Audit (Dependency Vulnerability Scan)
         run: |
-          pip-audit -r requirements.txt || true
+          uv run pip-audit -r requirements.txt || true
 
       - name: Upload Security Scan Artifacts
         uses: actions/upload-artifact@v4

@@ -30,10 +30,12 @@ jobs:
           enable-cache: true
 
       - name: Install Build Dependencies
-        run: uv pip install --system --break-system-packages build
+        run: |
+          uv sync --extra dev
+          echo "$GITHUB_WORKSPACE/.venv/bin" >> $GITHUB_PATH
 
       - name: Build Python Package (Wheel & sdist)
-        run: python -m build
+        run: uv run python -m build
 
       - name: Upload Python Package Artifacts
         uses: actions/upload-artifact@v4
@@ -67,7 +69,7 @@ jobs:
         env:
           DEPLOY_ENV: staging
           RELEASE_VERSION: ${{ github.ref_name || 'manual-dispatch' }}
-        run: python scripts/mock_deploy.py
+        run: uv run python scripts/mock_deploy.py
 
   deploy-production:
     name: Deploy to Production
@@ -97,7 +99,7 @@ jobs:
           DEPLOY_ENV: production
           RELEASE_VERSION: ${{ github.ref_name || 'manual-dispatch' }}
           DEPLOY_API_TOKEN: ${{ secrets.DEPLOY_API_TOKEN || 'mock-prod-token' }}
-        run: python scripts/mock_deploy.py
+        run: uv run python scripts/mock_deploy.py
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
