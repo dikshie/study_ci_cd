@@ -1,0 +1,111 @@
+name: "04 - Continuous Delivery & Release"
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      target_env:
+        description: "Target Environment"
+        required: true
+        default: "staging"
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  build-package:
+    name: Build Python Wheel and Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python 3.14
+        run: uv python install 3.14
+
+      - name: Install Build Dependencies
+        run: uv pip install --system build
+
+      - name: Build Python Package (Wheel & sdist)
+        run: python -m build
+
+      - name: Upload Python Package Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-dist
+          path: dist/
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker Image (Smoke Test)
+        run: docker build -t study-ci-cd:latest .
+
+  deploy-staging:
+    name: Deploy to Staging
+    needs: build-package
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: https://staging.example.com
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Set up Python 3.14
+        run: uv python install 3.14
+
+      - name: Run Staging Deployment Script
+        env:
+          DEPLOY_ENV: staging
+          RELEASE_VERSION: ${{ github.ref_name || 'manual-dispatch' }}
+        run: python scripts/mock_deploy.py
+
+  deploy-production:
+    name: Deploy to Production
+    needs: deploy-staging
+    if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.target_env == 'production'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://app.example.com
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Download Built Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: python-dist
+          path: dist/
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Set up Python 3.14
+        run: uv python install 3.14
+
+      - name: Run Production Deployment Script
+        env:
+          DEPLOY_ENV: production
+          RELEASE_VERSION: ${{ github.ref_name || 'manual-dispatch' }}
+          DEPLOY_API_TOKEN: ${{ secrets.DEPLOY_API_TOKEN || 'mock-prod-token' }}
+        run: python scripts/mock_deploy.py
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true
