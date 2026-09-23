@@ -23,16 +23,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Install uv
+      - name: Set up Python and uv
         uses: astral-sh/setup-uv@v5
         with:
+          python-version: "3.14"
           enable-cache: true
 
-      - name: Set up Python 3.14
-        run: uv python install 3.14
-
       - name: Install Build Dependencies
-        run: uv pip install --system build
+        run: uv pip install --system --break-system-packages build
 
       - name: Build Python Package (Wheel & sdist)
         run: python -m build
@@ -60,11 +58,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Install uv
+      - name: Set up Python and uv
         uses: astral-sh/setup-uv@v5
-
-      - name: Set up Python 3.14
-        run: uv python install 3.14
+        with:
+          python-version: "3.14"
 
       - name: Run Staging Deployment Script
         env:
@@ -90,11 +87,10 @@ jobs:
           name: python-dist
           path: dist/
 
-      - name: Install uv
+      - name: Set up Python and uv
         uses: astral-sh/setup-uv@v5
-
-      - name: Set up Python 3.14
-        run: uv python install 3.14
+        with:
+          python-version: "3.14"
 
       - name: Run Production Deployment Script
         env:

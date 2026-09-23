@@ -21,17 +21,15 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Install uv
+      - name: Set up Python and uv
         uses: astral-sh/setup-uv@v5
         with:
+          python-version: ${{ matrix.python-version }}
           enable-cache: true
-
-      - name: Set up Python ${{ matrix.python-version }}
-        run: uv python install ${{ matrix.python-version }}
 
       - name: Install Dependencies
         run: |
-          uv pip install --system -r requirements.txt -r requirements-dev.txt -e .
+          uv pip install --system --break-system-packages -r requirements.txt -r requirements-dev.txt -e .
 
       - name: Run Test Suite with Coverage
         run: |

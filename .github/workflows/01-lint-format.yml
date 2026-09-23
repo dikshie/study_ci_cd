@@ -16,16 +16,14 @@ jobs:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      - name: Install uv
+      - name: Set up Python and uv
         uses: astral-sh/setup-uv@v5
         with:
+          python-version: "3.14"
           enable-cache: true
 
-      - name: Set up Python 3.14
-        run: uv python install 3.14
-
       - name: Install Dependencies
-        run: uv pip install --system -r requirements-dev.txt -e .
+        run: uv pip install --system --break-system-packages -r requirements-dev.txt -e .
 
       - name: Check Code Formatting (Black)
         run: black --check src/ tests/
