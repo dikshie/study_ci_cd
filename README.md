@@ -90,12 +90,14 @@ source .venv/bin/activate
 
 ### 2. Install Dependencies
 ```bash
-# Install runtime and development dependencies in editable mode
-uv pip install -e ".[dev]"
+# Sync runtime and development dependencies into virtual environment
+uv sync --extra dev
 ```
 
-Alternatively, install from requirement files:
+Alternatively, install in editable mode or from requirement files:
 ```bash
+uv pip install -e ".[dev]"
+# or
 uv pip install -r requirements.txt -r requirements-dev.txt
 ```
 
@@ -158,7 +160,7 @@ Master automated test suites, test coverage thresholds, matrix execution across 
 | **Day 6** | **Unit Testing with Pytest** | • Study [tests/test_calculator.py](file:///tests/test_calculator.py) and [tests/test_data_processor.py](file:///tests/test_data_processor.py).<br>• Run `pytest -v` locally.<br>• Add a new math utility in [src/calculator.py](file:///src/calculator.py) and write a corresponding test. | All unit tests pass with detailed output. |
 | **Day 7** | **Parameterized & Exception Testing** | • Use `@pytest.mark.parametrize` to test multiple inputs/outputs in a single test function.<br>• Write tests verifying exceptions using `pytest.raises(ValueError)`. | Clear, non-repetitive test code covering boundary cases. |
 | **Day 8** | **Code Coverage Analysis** | • Run `pytest --cov=src --cov-report=term-missing`.<br>• Generate HTML coverage report using `--cov-report=html`.<br>• Inspect the generated `htmlcov/index.html` in your browser. | Achieve > 90% test coverage across all `src/` modules. |
-| **Day 9** | **Matrix Builds in GitHub Actions** | • Inspect [.github/workflows/02-tests-matrix.yml](file:///.github/workflows/02-tests-matrix.yml).<br>• Learn `strategy.matrix` configuration across Python `3.10`, `3.11`, and `3.12`.<br>• Push a commit and observe 3 parallel jobs executing in GitHub Actions. | Simultaneous verification of Python version compatibility. |
+| **Day 9** | **Matrix Builds in GitHub Actions** | • Inspect [.github/workflows/02-tests-matrix.yml](file:///.github/workflows/02-tests-matrix.yml).<br>• Learn `strategy.matrix` configuration across Python `3.12`, `3.13`, and `3.14`.<br>• Push a commit and observe 3 parallel jobs executing in GitHub Actions. | Simultaneous verification of Python version compatibility. |
 | **Day 10** | **Workflow Artifacts & Summary Reports** | • Study `actions/upload-artifact@v4` in `02-tests-matrix.yml`.<br>• Download the `coverage-report-html` artifact zip file from the GitHub Actions run summary page.<br>• Extract and view the artifact. | Artifacts successfully uploaded from runner and accessible in GitHub UI. |
 
 ---
@@ -174,7 +176,7 @@ Integrate security into CI (DevSecOps), conduct automated static application sec
 | **Day 12** | **Static Security Analysis with Bandit** | • Run `bandit -r src/ -ll` locally.<br>• Introduce a mock insecure pattern (e.g. `assert` in production logic or hardcoded secret) in a branch to see Bandit flag it.<br>• Understand how to configure Bandit skip rules. | Bandit SAST reports zero high/medium severity security issues. |
 | **Day 13** | **Dependency Vulnerability Scanning (`pip-audit`)** | • Run `pip-audit -r requirements.txt` locally.<br>• Inspect how `pip-audit` queries the Python Packaging Advisory Database (PyPA). | Assurance that third-party packages have no known CVEs. |
 | **Day 14** | **Scheduled CI Workflows (Cron)** | • Inspect the `schedule:` block in [.github/workflows/03-security-audit.yml](file:///.github/workflows/03-security-audit.yml).<br>• Learn POSIX cron syntax (`0 6 * * 1` = every Monday at 06:00 UTC).<br>• Trigger the security workflow manually via `workflow_dispatch`. | Security scan runs automatically on schedule without requiring a git push. |
-| **Day 15** | **CI Caching & Performance Optimization** | • Learn how `actions/setup-python` caches pip/uv dependencies.<br>• Compare workflow execution time with cache hit vs cache miss.<br>• Optimize workflow runtime. | Fast, cached CI job execution (typically < 30 seconds). |
+| **Day 15** | **CI Caching & Performance Optimization** | • Learn how `astral-sh/setup-uv` caches uv dependencies.<br>• Compare workflow execution time with cache hit vs cache miss.<br>• Optimize workflow runtime. | Fast, cached CI job execution (typically < 30 seconds). |
 
 ---
 
@@ -198,7 +200,7 @@ Build distributable Python packages, containerize with Docker, manage GitHub Env
 | Workflow File | Trigger Events | Purpose / Actions |
 | :--- | :--- | :--- |
 | [`01-lint-format.yml`](file:///.github/workflows/01-lint-format.yml) | `push`, `pull_request` on `main`, `develop` | Runs `black --check`, `ruff check`, and `mypy` static type analysis. |
-| [`02-tests-matrix.yml`](file:///.github/workflows/02-tests-matrix.yml) | `push`, `pull_request` on `main`, `develop` | Runs `pytest` with coverage across Python 3.10, 3.11, 3.12 matrix and uploads HTML coverage artifact. |
+| [`02-tests-matrix.yml`](file:///.github/workflows/02-tests-matrix.yml) | `push`, `pull_request` on `main`, `develop` | Runs `pytest` with coverage across Python 3.12, 3.13, 3.14 matrix and uploads HTML coverage artifact. |
 | [`03-security-audit.yml`](file:///.github/workflows/03-security-audit.yml) | `push` on `main`, Weekly Cron, Manual Dispatch | Runs `bandit` SAST security scans and `pip-audit` dependency vulnerability checks. |
 | [`04-cd-release.yml`](file:///.github/workflows/04-cd-release.yml) | Git tag `v*.*.*`, Manual Dispatch | Builds wheel distribution, tests Docker build, deploys to Staging/Production, and publishes GitHub Release. |
 
@@ -283,6 +285,6 @@ Build distributable Python packages, containerize with Docker, manage GitHub Env
 ## 🏆 Learning Milestones Checklist
 
 - [ ] **Week 1**: All PRs automatically linted and type-checked before merge.
-- [ ] **Week 2**: Unit tests running across Python 3.10, 3.11, 3.12 with > 80% coverage.
+- [ ] **Week 2**: Unit tests running across Python 3.12, 3.13, 3.14 with > 80% coverage.
 - [ ] **Week 3**: Security scanning running on commit and scheduled weekly cron.
 - [ ] **Week 4**: Automated Docker build, environment deployment, and GitHub Releases on tag.
