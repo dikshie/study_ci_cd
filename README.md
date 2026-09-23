@@ -20,6 +20,8 @@ A comprehensive, hands-on 4-week (20 working days) practical curriculum for lear
   - [2. Configuring GitHub Secrets & Environments](#2-configuring-github-secrets--environments)
   - [3. Triggering a Production Release with Git Tags](#3-triggering-a-production-release-with-git-tags)
 - [Local Verification Commands](#-local-verification-commands)
+- [CI/CD Best Practices & Key Takeaways](#-cicd-best-practices--key-takeaways)
+- [Learning Milestones Checklist](#-learning-milestones-checklist)
 
 ---
 
@@ -279,6 +281,24 @@ Build distributable Python packages, containerize with Docker, manage GitHub Env
 | `uv run bandit -r src -ll` | Run SAST security check |
 | `uv run python -m build` | Build wheel and source distributions |
 | `./scripts/run_local_checks.sh` | Run all quality and test checks sequentially |
+
+---
+
+## 💡 CI/CD Best Practices & Key Takeaways
+
+1. **Virtual Environment Isolation & PEP 668**:
+   - Modern Linux runners (Ubuntu 24.04+) enforce PEP 668 (`EXTERNALLY-MANAGED`) to protect system Python packages.
+   - Always use `astral-sh/setup-uv` with `python-version: ...` and `uv sync` to isolate dependencies within `.venv` rather than installing into global system directories.
+
+2. **Tool Execution with `uv run`**:
+   - Prefix commands with `uv run` (e.g., `uv run pytest`, `uv run black`) or export `$GITHUB_WORKSPACE/.venv/bin` into `$GITHUB_PATH` so that all installed tools are immediately found in CI.
+
+3. **Multi-Version Syntax Compatibility (Python 3.12 - 3.14)**:
+   - When handling multiple exception types, always enclose them in parentheses: `except (json.JSONDecodeError, TypeError):`.
+   - Keep tool target versions (e.g., `[tool.black]` and `[tool.ruff]`) aligned with the minimum supported matrix version (`py312`).
+
+4. **Deterministic Builds with `uv.lock`**:
+   - Keep `uv.lock` checked into Git for reproducible CI runs and fast cached installations.
 
 ---
 
